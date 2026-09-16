@@ -2,6 +2,7 @@
   "name": "ielts-vocab-desktop",
   "version": "1.0.0",
   "description": "面向雅思备考的 macOS 词汇学习工具",
+  "author": "IELTS Vocab Contributors",
   "main": "main.js",
   "engines": {
     "node": ">=22"
