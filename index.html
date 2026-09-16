@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f6f5">
+<title>雅思词汇 · 学习工作台</title>
+<style>
+  :root {
+    --paper: #f4f6f5;
+    --surface: #f9fbfa;
+    --surface-strong: #ffffff;
+    --ink: #172522;
+    --muted: #4f605b;
+    --soft: #60716c;
+    --line: #dde5e1;
+    --line-strong: #cbd7d1;
+    --teal: #1b746c;
+    --teal-dark: #11564f;
+    --teal-soft: #e3efec;
+    --orange: #b9662c;
+    --orange-soft: #f6eadd;
+    --blue: #2d69a5;
+    --blue-soft: #e7eff8;
+    --rose: #ae5960;
+    --rose-soft: #f7e9e8;
+    --shadow: 0 14px 34px rgba(31, 54, 48, .06);
+    --shadow-small: 0 3px 12px rgba(31, 54, 48, .04);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, textarea { font: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, textarea:focus-visible { outline: 3px solid rgba(10, 113, 103, .28); outline-offset: 2px; }
+  button:disabled { cursor: default; }
+  .hidden { display: none !important; }
+
+  .app-shell { max-width: 1160px; margin: 0 auto; padding: 24px 32px 60px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 40px; }
+  .brand-lockup { display: flex; align-items: center; gap: 10px; }
+  .brand-lockup img { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
+  .brand-name { margin: 0; font-size: 16px; line-height: 1.1; font-weight: 780; letter-spacing: .01em; }
+  .brand-sub { display: block; margin-top: 4px; color: var(--soft); font-size: 12px; letter-spacing: .04em; }
+  .top-meta { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 13px; }
+  .local-badge { padding: 6px 9px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--teal-dark); background: rgba(255,255,255,.45); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 64px; align-items: start; }
+  .main-column { min-width: 0; }
+  .hero-block { max-width: 760px; }
+  .hero-block h1 { max-width: 620px; margin: 0; font-size: 44px; line-height: 1.1; letter-spacing: -.03em; font-weight: 780; }
+  .hero-block p { max-width: 590px; margin: 14px 0 26px; color: var(--muted); font-size: 16px; line-height: 1.65; }
+  .search-panel { padding: 15px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface-strong); box-shadow: var(--shadow-small); }
+  .search-panel label { display: block; margin: 0 0 10px; font-size: 14px; font-weight: 750; color: var(--ink); }
+  .search-row { display: flex; align-items: stretch; gap: 10px; }
+  .search-row textarea { flex: 1; min-height: 50px; max-height: 130px; resize: none; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fcfdfb; color: var(--ink); line-height: 1.5; }
+  .search-row textarea::placeholder { color: #98a29f; }
+  .search-row textarea:focus { border-color: var(--teal); outline: none; box-shadow: 0 0 0 3px rgba(10, 113, 103, .12); }
+  .primary { min-width: 86px; min-height: 50px; padding: 0 18px; border: 1px solid var(--teal); border-radius: 8px; background: var(--teal); color: #fff; font-size: 14px; font-weight: 760; transition: background .18s, transform .18s; }
+  .primary:hover { background: var(--teal-dark); }
+  .primary:active { transform: translateY(1px); }
+  .primary:disabled { opacity: .52; transform: none; }
+  .search-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--soft); font-size: 13px; }
+  .suggestion-row { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+  .suggestion { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 13px; }
+  .suggestion:hover { border-color: var(--teal); color: var(--teal-dark); }
+
+  .stat-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 32px 0 26px; border-top: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); }
+  .stat { padding: 15px 16px 16px 0; }
+  .stat + .stat { padding-left: 16px; border-left: 1px solid var(--line); }
+  .stat-value { display: block; font-size: 22px; line-height: 1; font-weight: 770; font-variant-numeric: tabular-nums; }
+  .stat-label { display: block; margin-top: 7px; color: var(--soft); font-size: 13px; }
+
+  .section-nav { display: flex; align-items: center; gap: 4px; margin-bottom: 22px; border-bottom: 1px solid var(--line-strong); overflow-x: auto; }
+  .nav-item { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 43px; padding: 0 7px; border: 0; background: transparent; color: var(--muted); font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .nav-item::after { position: absolute; right: 7px; bottom: -1px; left: 7px; height: 2px; background: transparent; content: ""; }
+  .nav-item:hover { color: var(--ink); }
+  .nav-item.active { color: var(--teal-dark); }
+  .nav-item.active::after { background: var(--teal); }
+  .badge { min-width: 18px; padding: 2px 5px; border-radius: 999px; background: var(--teal-soft); color: var(--teal-dark); font-size: 10px; line-height: 1.2; text-align: center; }
+
+  .progress { align-items: center; gap: 12px; padding: 13px 14px; margin: 0 0 18px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.52); color: var(--muted); font-size: 13px; }
+  .progress.show { display: flex; }
+  .progress-mark { width: 28px; height: 8px; overflow: hidden; border-radius: 4px; background: var(--teal-soft); }
+  .progress-mark::before { display: block; width: 12px; height: 100%; border-radius: inherit; background: var(--teal); content: ""; animation: sweep 1s ease-in-out infinite alternate; }
+  @keyframes sweep { from { transform: translateX(0); } to { transform: translateX(16px); } }
+  .loading-stack { display: grid; gap: 10px; padding: 24px 0; }
+  .skeleton { height: 16px; border-radius: 5px; background: #e6ebe7; animation: breathe 1.2s ease-in-out infinite alternate; }
+  .skeleton.wide { width: 72%; height: 32px; }
+  .skeleton.short { width: 38%; }
+  @keyframes breathe { from { opacity: .55; } to { opacity: 1; } }
+
+  .welcome { padding: 28px 0 8px; border-bottom: 1px solid var(--line); }
+  .welcome h2 { max-width: 650px; margin: 0; font-size: 24px; line-height: 1.25; letter-spacing: -.02em; }
+  .welcome p { max-width: 600px; margin: 10px 0 22px; color: var(--muted); font-size: 15px; line-height: 1.7; }
+  .welcome-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+  .welcome-action { min-height: 96px; padding: 14px 14px 14px 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; text-align: left; color: var(--ink); }
+  .welcome-action + .welcome-action { padding-left: 14px; border-left: 1px solid var(--line); }
+  .welcome-action:hover { color: var(--teal-dark); background: transparent; }
+  .welcome-action strong { display: block; font-size: 14px; }
+  .welcome-action span { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+  .welcome-note { display: flex; align-items: center; gap: 9px; margin-top: 20px; color: var(--soft); font-size: 13px; }
+  .note-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+
+  .err { padding: 14px 16px; margin: 16px 0; border: 1px solid #ecc9c3; border-radius: 10px; background: #fff6f4; color: #9a433b; font-size: 14px; line-height: 1.6; }
+  .entry { margin-top: 6px; padding: 0 0 30px; }
+  .headline { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 26px 0 24px; border-bottom: 1px solid var(--line-strong); }
+  .headline .left { min-width: 0; }
+  .headline .word { overflow-wrap: anywhere; font-size: 39px; line-height: 1.05; letter-spacing: -.03em; font-weight: 800; }
+  .headline .ipa { margin-top: 8px; color: var(--muted); font-size: 15px; }
+  .acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+  .action { min-height: 38px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-strong); color: var(--muted); font-size: 12px; font-weight: 720; }
+  .action:hover { border-color: var(--teal); color: var(--teal-dark); }
+  .action.on { border-color: var(--teal); background: var(--teal-soft); color: var(--teal-dark); }
+  .action.key.on { border-color: #d79d6c; background: var(--orange-soft); color: #98521f; }
+  .entry-section { padding: 25px 0 5px; border-bottom: 1px solid var(--line); }
+  .entry-section:last-child { border-bottom: 0; }
+  .sec-title { margin: 0 0 15px; color: var(--soft); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .sec-title.teal { color: var(--teal); }
+  .sec-title.orange { color: var(--orange); }
+  .skill { display: grid; grid-template-columns: 140px minmax(220px, 1fr); gap: 7px 20px; align-items: center; padding: 13px 0; }
+  .skill + .skill { border-top: 1px dashed var(--line); }
+  .skill .name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 750; }
+  .dot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; }
+  .metrics { display: grid; gap: 7px; }
+  .metric { display: grid; grid-template-columns: 54px minmax(0, 1fr) 27px; gap: 9px; align-items: center; color: var(--muted); font-size: 12.5px; }
+  .bar { height: 6px; overflow: hidden; border-radius: 4px; background: #e6ebe7; }
+  .bar > i { display: block; height: 100%; border-radius: inherit; }
+  .metric .mv { color: var(--ink); font-size: 13px; font-weight: 760; text-align: right; }
+  .skill .cm { grid-column: 1 / -1; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  .meaning { padding: 10px 0; }
+  .meaning + .meaning { border-top: 1px dashed var(--line); }
+  .pos { display: inline-block; margin-right: 8px; padding: 3px 7px; border-radius: 5px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 760; vertical-align: 1px; }
+  .meaning .en { font-size: 15px; }
+  .meaning .zh { margin-top: 4px; color: var(--muted); font-size: 13px; }
+  .collo { padding: 11px 0; }
+  .collo + .collo { border-top: 1px dashed var(--line); }
+  .collo .cp { display: inline-block; padding: 4px 8px; border-radius: 5px; background: var(--orange-soft); color: #96521f; font-size: 13px; font-weight: 760; }
+  .collo .cz { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+  ul.ex { padding: 0; margin: 0; list-style: none; }
+  ul.ex li { position: relative; padding: 13px 100px 13px 14px; margin-bottom: 9px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.48); font-size: 14px; line-height: 1.65; }
+  ul.ex li:last-child { margin-bottom: 0; }
+  .ex-speak li { border-color: #c5dfe2; background: #f1f9f8; }
+  .ex-write li { border-color: #ecd8bd; background: #fcf7ee; }
+  ul.ex .copy { position: absolute; top: 12px; right: 10px; min-height: 28px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--muted); font-size: 11px; }
+  ul.ex .copy:hover, ul.ex .copy.done { border-color: var(--teal); color: var(--teal-dark); }
+  ul.ex .ex-zh { margin-top: 4px; color: var(--muted); font-size: 12.5px; }
+  ul.ex .band { float: left; margin: 2px 8px 0 0; padding: 1px 6px; border-radius: 4px; color: #fff; font-size: 10px; font-weight: 800; line-height: 17px; }
+  ul.ex .band-7 { background: #71807d; }
+  ul.ex .band-8 { background: var(--blue); }
+  ul.ex .band-9 { background: var(--orange); }
+
+  .warnbox { padding: 16px; margin: 18px 0 0; border: 1px solid #e4c7a3; border-radius: 10px; background: #fff9f0; }
+  .warn-h { margin-bottom: 10px; color: #98521f; font-size: 13px; font-weight: 760; line-height: 1.5; }
+  .upg { padding: 8px 0; }
+  .upg + .upg { border-top: 1px dashed #ead7be; }
+  .upg .uw { color: #83471c; font-size: 14px; font-weight: 760; }
+  .upg .un { margin-top: 3px; color: #876b4e; font-size: 13px; line-height: 1.55; }
+  .usage .blk { padding: 11px 0; }
+  .usage .blk + .blk { border-top: 1px dashed var(--line); }
+  .usage .lbl { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 13px; font-weight: 760; }
+  .usage p { margin: 0; font-size: 14px; line-height: 1.7; }
+  .syn { padding: 10px 0; }
+  .syn + .syn { border-top: 1px dashed var(--line); }
+  .syn .sw { font-size: 14px; font-weight: 760; }
+  .syn .sd { margin-top: 3px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  .list-section { padding: 4px 0 0; }
+  .list-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--line-strong); }
+  .list-head h2 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
+  .list-head p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+  .list-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+  .subtle { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; }
+  .subtle:hover { border-color: var(--teal); color: var(--teal-dark); }
+  .subtle.danger:hover { border-color: #c77870; color: #a14a42; }
+  .row-list { border-bottom: 1px solid var(--line); }
+  .row-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 66px; padding: 10px 0; }
+  .row-item + .row-item { border-top: 1px solid var(--line); }
+  .row-open { flex: 1; min-width: 0; padding: 5px 0; border: 0; background: transparent; text-align: left; color: var(--ink); }
+  .row-open:hover .w { color: var(--teal-dark); }
+  .row-item .w { display: block; overflow-wrap: anywhere; font-size: 15px; font-weight: 760; }
+  .row-item .meta { display: block; overflow: hidden; margin-top: 4px; color: var(--soft); font-size: 13px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+  .row-delete { flex: 0 0 auto; min-height: 32px; padding: 0 8px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--soft); font-size: 12px; }
+  .row-delete:hover { border-color: #e8c9c5; background: #fff6f4; color: #a14a42; }
+  .empty { padding: 34px 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+  .list-note { margin: 13px 0; color: var(--soft); font-size: 13px; line-height: 1.6; }
+
+  .side-rail { position: sticky; top: 20px; padding-top: 2px; }
+  .rail-section { padding: 0 0 25px; margin-bottom: 25px; border-bottom: 1px solid var(--line-strong); }
+  .rail-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .rail-heading h2 { margin: 0; font-size: 15px; letter-spacing: .01em; }
+  .rail-link { padding: 0; border: 0; background: transparent; color: var(--teal); font-size: 12px; font-weight: 750; }
+  .rail-link:hover { color: var(--teal-dark); text-decoration: underline; text-underline-offset: 3px; }
+  .plan-list { display: grid; gap: 14px; margin-top: 18px; }
+  .plan-row { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
+  .plan-number { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--teal-soft); color: var(--teal-dark); font-size: 11px; font-weight: 800; }
+  .plan-row strong { display: block; font-size: 13px; }
+  .plan-row span { display: block; margin-top: 3px; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+  .rail-history { display: grid; gap: 0; margin-top: 13px; }
+  .rail-history .recent { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; padding: 10px 0; border-top: 1px solid var(--line); }
+  .rail-history .recent:first-child { border-top: 0; }
+  .recent button { min-width: 0; overflow: hidden; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 13px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+  .recent button:hover { color: var(--teal-dark); }
+  .recent span { flex: 0 0 auto; color: var(--soft); font-size: 12px; }
+  .rail-empty { padding: 12px 0 0; color: var(--soft); font-size: 13px; line-height: 1.55; }
+  .rail-tip { padding: 15px; border: 1px solid #d4e4df; border-radius: 10px; background: var(--teal-soft); }
+  .rail-tip strong { display: block; color: var(--teal-dark); font-size: 13px; }
+  .rail-tip p { margin: 7px 0 0; color: #4d6d68; font-size: 13px; line-height: 1.6; }
+
+  .settings-section { padding: 4px 0 0; }
+  .settings-kicker { margin: 0 0 8px; color: var(--teal); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .settings-section h2 { margin: 0; font-size: 27px; line-height: 1.2; letter-spacing: -.02em; }
+  .settings-intro { max-width: 650px; padding: 16px 0 22px; border-bottom: 1px solid var(--line-strong); }
+  .settings-intro p { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+  .settings-status { display: flex; align-items: center; gap: 9px; padding: 15px 16px; margin: 24px 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .settings-status::before { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: var(--orange); content: ""; }
+  .settings-status.ready { border-color: #b9d8d0; background: var(--teal-soft); color: var(--teal-dark); }
+  .settings-status.ready::before { background: var(--teal); }
+  .settings-status.error { border-color: #e4c6be; background: #fff6f4; color: #9a433b; }
+  .settings-status.error::before { background: #b85c4f; }
+  .settings-form { max-width: 650px; padding: 22px 0 0; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 760; }
+  .field input { width: 100%; min-height: 46px; padding: 0 13px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-strong); color: var(--ink); font-size: 15px; }
+  .field input:focus { border-color: var(--teal); outline: none; box-shadow: 0 0 0 3px rgba(10, 113, 103, .12); }
+  .field-help { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+  .settings-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .settings-actions .primary { min-width: 112px; }
+  .settings-note { margin: 20px 0 0; color: var(--soft); font-size: 13px; line-height: 1.65; }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 32px; }
+    .hero-block h1 { font-size: 42px; }
+  }
+  @media (max-width: 760px) {
+    .app-shell { padding: 16px 17px 48px; }
+    .topbar { margin-bottom: 34px; }
+    .top-meta { display: none; }
+    .layout { display: block; }
+    .hero-block h1 { font-size: 36px; }
+    .hero-block p { margin-bottom: 24px; font-size: 15px; }
+    .search-row { display: block; }
+    .search-row textarea { display: block; width: 100%; }
+    .primary { width: 100%; margin-top: 9px; }
+    .search-foot { display: block; }
+    .suggestion-row { justify-content: flex-start; margin-top: 9px; }
+    .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px; }
+    .stat:nth-child(3) { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+    .stat:nth-child(4) { border-top: 1px solid var(--line); }
+    .skill { grid-template-columns: 1fr; gap: 8px; }
+    .skill .cm { grid-column: auto; }
+    .headline { display: block; }
+    .acts { justify-content: flex-start; margin-top: 17px; }
+    .welcome-grid { grid-template-columns: 1fr; }
+    .list-head { display: block; }
+    .list-actions { justify-content: flex-start; margin-top: 13px; }
+    .side-rail { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 34px; }
+    .side-rail .rail-tip { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-lockup">
+      <img src="icon.png" alt="">
+      <div><p class="brand-name">雅思词汇</p><span class="brand-sub">雅思词汇学习工具</span></div>
+    </div>
+    <div class="top-meta"><span class="local-badge">记录保存在本机</span><span id="today-label"></span></div>
+  </header>
+
+  <div class="layout">
+    <main class="main-column">
+      <section class="hero-block">
+        <h1>把一个词，学到能用。</h1>
+        <p>从释义到语境，把下一个表达变成你能说、能写的词。</p>
+        <form id="search-form" class="search-panel">
+          <label for="q">搜索一个词，开始拆解</label>
+          <div class="search-row">
+            <textarea id="q" rows="1" aria-label="输入单词" placeholder="输入一个单词，也可以一次粘贴多个词"></textarea>
+            <button class="primary" id="go" type="submit">查词</button>
+          </div>
+          <div class="search-foot"><span>支持空格、逗号或换行分隔 · 回车查询</span><div class="suggestion-row"><button class="suggestion" type="button" data-act="suggest" data-word="substantial">substantial</button><button class="suggestion" type="button" data-act="suggest" data-word="mitigate">mitigate</button><button class="suggestion" type="button" data-act="suggest" data-word="significant">significant</button></div></div>
+        </form>
+      </section>
+
+      <section class="stat-strip" aria-label="学习统计">
+        <div class="stat"><span class="stat-value" id="stat-history">0</span><span class="stat-label">已查词</span></div>
+        <div class="stat"><span class="stat-value" id="stat-key">0</span><span class="stat-label">重点词</span></div>
+        <div class="stat"><span class="stat-value" id="stat-wordbook">0</span><span class="stat-label">待复习</span></div>
+        <div class="stat"><span class="stat-value" id="stat-cache">0</span><span class="stat-label">已保存释义</span></div>
+      </section>
+
+      <nav class="section-nav" aria-label="学习内容导航">
+        <button class="nav-item active" type="button" data-tab="results">学习台</button>
+        <button class="nav-item" type="button" data-tab="wordbook">生词本<span class="badge hidden" id="wbadge">0</span></button>
+        <button class="nav-item" type="button" data-tab="keyvocab">重点词汇<span class="badge hidden" id="kbadge">0</span></button>
+        <button class="nav-item" type="button" data-tab="history">历史<span class="badge hidden" id="hbadge">0</span></button>
+        <button class="nav-item" type="button" data-tab="settings">模型设置</button>
+      </nav>
+
+      <div id="progress" class="progress hidden"><span class="progress-mark"></span><span id="progress-text"></span></div>
+      <div id="panel-results"></div>
+      <div id="panel-history" class="hidden"></div>
+      <div id="panel-wordbook" class="hidden"></div>
+      <div id="panel-keyvocab" class="hidden"></div>
+      <div id="panel-settings" class="hidden">
+        <section class="settings-section">
+          <div class="settings-intro">
+            <p class="settings-kicker">模型设置</p>
+            <h2>连接你的模型，开始查词。</h2>
+            <p>查询内容由你配置的人工智能接口生成。桌面版保存到本机配置；浏览器版保存到当前设备，并通过后端完成查询。</p>
+          </div>
+          <div id="settings-status" class="settings-status">正在读取当前模型设置…</div>
+          <form id="settings-form" class="settings-form">
+            <div class="field">
+              <label for="api-key">API Key</label>
+              <input id="api-key" type="password" autocomplete="off" placeholder="输入密钥；留空表示保留已保存密钥">
+              <p class="field-help">密钥不会写入网页源码。公开网页会保存在当前设备，并只随查询请求发送到后端。</p>
+            </div>
+            <div class="field">
+              <label for="model-name">模型名称</label>
+              <input id="model-name" type="text" autocomplete="off" placeholder="例如 deepseek-v4-flash">
+            </div>
+            <div class="field">
+              <label for="base-url">接口地址</label>
+              <input id="base-url" type="url" autocomplete="url" placeholder="https://api.deepseek.com">
+              <p class="field-help">需要兼容 OpenAI Chat Completions 格式，并提供 `/chat/completions` 路径。</p>
+            </div>
+            <div class="settings-actions">
+              <button class="primary" type="submit">保存设置</button>
+              <button class="subtle" type="button" data-act="testconnection">测试模型连接</button>
+              <button class="subtle" type="button" data-act="openconfig">打开本地配置</button>
+            </div>
+            <p id="settings-note" class="settings-note">首次使用请填写 API Key、模型名称和接口地址。</p>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <aside class="side-rail" aria-label="学习辅助">
+      <section class="rail-section">
+        <div class="rail-heading"><h2>一条词汇路径</h2></div>
+        <div class="plan-list">
+          <div class="plan-row"><span class="plan-number">1</span><div><strong>查清楚</strong><span>看释义、语感和听说读写场景。</span></div></div>
+          <div class="plan-row"><span class="plan-number">2</span><div><strong>留下来</strong><span>标记重点词，加入生词本。</span></div></div>
+          <div class="plan-row"><span class="plan-number">3</span><div><strong>带走复习</strong><span>整理成 Anki 卡片，继续练习。</span></div></div>
+        </div>
+      </section>
+      <section class="rail-section">
+        <div class="rail-heading"><h2>最近查过</h2><button class="rail-link" type="button" data-act="open-history">查看全部</button></div>
+        <div class="rail-history" id="rail-history"></div>
+      </section>
+      <section class="rail-tip"><strong>小提示</strong><p>不确定一个词值不值得记时，先看它在写作和口语里的地道度，再决定是否加入重点。</p></section>
+    </aside>
+  </div>
+</div>
+
+<script>
+const $ = (selector) => document.querySelector(selector);
+const input = $("#q");
+const goBtn = $("#go");
+const panels = { results: $("#panel-results"), history: $("#panel-history"), wordbook: $("#panel-wordbook"), keyvocab: $("#panel-keyvocab"), settings: $("#panel-settings") };
+const progress = $("#progress");
+const progressText = $("#progress-text");
+const appApi = window.ieltsApp || null;
+const DEFAULT_API_CONFIG = { model: "deepseek-v4-flash", baseUrl: "https://api.deepseek.com" };
+
+const LS = {
+  get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+  set(key, value) { localStorage.setItem(key, JSON.stringify(value)); },
+};
+let cache = LS.get("ielts_cache", {});
+let history = LS.get("ielts_history", []);
+let keyvocab = LS.get("ielts_keyvocab", []);
+let wordbook = LS.get("ielts_wordbook", []);
+const storedApiConfig = LS.get("ielts_api_config", {});
+let apiConfig = {
+  ...DEFAULT_API_CONFIG,
+  ...(storedApiConfig && typeof storedApiConfig === "object" ? storedApiConfig : {}),
+  apiKey: String((storedApiConfig && storedApiConfig.apiKey) || ""),
+  apiKeyConfigured: Boolean(storedApiConfig && storedApiConfig.apiKey),
+  userConfigured: Boolean(storedApiConfig && (storedApiConfig.userConfigured || storedApiConfig.apiKey)),
+};
+let configReady = Promise.resolve();
+const save = () => {
+  LS.set("ielts_cache", cache);
+  LS.set("ielts_history", history);
+  LS.set("ielts_keyvocab", keyvocab);
+  LS.set("ielts_wordbook", wordbook);
+};
+
+const SKILLS = [
+  { key: "speaking", label: "口语", color: "#2c8c92" },
+  { key: "writing", label: "写作", color: "#bb7137" },
+  { key: "listening", label: "听力", color: "#3b8a6e" },
+  { key: "reading", label: "阅读", color: "#ad5c6a" },
+];
+
+function esc(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+}
+function clamp(value) { return Math.max(0, Math.min(5, Math.round(Number(value) || 0))); }
+function apiFetch(path, options) {
+  if (!/^https?:$/.test(location.protocol)) throw new Error("当前页面是直接打开的文件，无法连接后端。请运行 npm start，或运行 npm run start:web 后访问 http://localhost:5179。");
+  return fetch(path, options);
+}
+
+function isLocalBrowser() {
+  return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+}
+
+function renderSettings(message) {
+  const model = $("#model-name");
+  const baseUrl = $("#base-url");
+  const status = $("#settings-status");
+  const note = $("#settings-note");
+  const openConfig = document.querySelector('[data-act="openconfig"]');
+  if (!model || !baseUrl || !status) return;
+
+  model.value = apiConfig.model || DEFAULT_API_CONFIG.model;
+  baseUrl.value = apiConfig.baseUrl || DEFAULT_API_CONFIG.baseUrl;
+  if (openConfig) openConfig.classList.toggle("hidden", !appApi || !appApi.openConfig);
+
+  const ready = Boolean(apiConfig.apiKeyConfigured || apiConfig.apiKey || apiConfig.serverConfigured);
+  const configuredLabel = appApi || isLocalBrowser() ? "本机服务配置已就绪" : "已连接站点默认模型";
+  const failed = Boolean(message && /失败|无法|请先|错误/.test(message));
+  status.classList.toggle("ready", ready && !failed);
+  status.classList.toggle("error", failed);
+  status.textContent = message || (ready
+    ? (apiConfig.apiKey ? `当前设备已保存模型配置 · ${apiConfig.model || DEFAULT_API_CONFIG.model}` : `${configuredLabel} · ${apiConfig.model || DEFAULT_API_CONFIG.model}`)
+    : "尚未配置模型 · 填写 API Key 后才能查询");
+  if (note && !message) note.textContent = ready ? "可以直接回到学习台查询。需要更换模型时，重新填写后保存即可。" : "首次使用请填写 API Key、模型名称和接口地址。";
+}
+
+async function loadApiConfig() {
+  try {
+    if (appApi && appApi.getApiConfig) {
+      const result = await appApi.getApiConfig();
+      apiConfig = { ...apiConfig, ...(result || {}) };
+    } else {
+      const response = await apiFetch("/api/config");
+      if (response.ok) {
+        const result = await response.json();
+        apiConfig = { ...apiConfig, ...(result || {}), serverConfigured: Boolean(result && result.apiKeyConfigured) };
+      }
+    }
+  } catch (error) {
+    // 公开网页可以不预置服务端默认配置。
+  }
+  renderSettings();
+}
+
+async function saveApiSettings(event) {
+  event.preventDefault();
+  const keyInput = $("#api-key");
+  const model = $("#model-name").value.trim() || DEFAULT_API_CONFIG.model;
+  const baseUrl = $("#base-url").value.trim() || DEFAULT_API_CONFIG.baseUrl;
+  let parsedUrl;
+  try { parsedUrl = new URL(baseUrl); } catch { parsedUrl = null; }
+  if (!parsedUrl || !/^https?:$/.test(parsedUrl.protocol)) {
+    renderSettings("接口地址需要是 http:// 或 https:// 开头的地址。");
+    $("#base-url").focus();
+    return;
+  }
+
+  const payload = { model, baseUrl: baseUrl.replace(/\/+$/, "") };
+  const enteredKey = keyInput.value.trim();
+  if (enteredKey) payload.apiKey = enteredKey;
+  else if (!appApi && apiConfig.apiKey) payload.apiKey = apiConfig.apiKey;
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = "保存中…";
+  try {
+    let result = {};
+    if (appApi && appApi.saveApiConfig) {
+      result = await appApi.saveApiConfig(payload);
+    } else if (isLocalBrowser()) {
+      const response = await apiFetch("/api/config", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+      result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "设置保存失败");
+    }
+    apiConfig = { ...apiConfig, ...payload, ...(result || {}), userConfigured: true };
+    if (enteredKey) apiConfig.apiKey = enteredKey;
+    apiConfig.apiKeyConfigured = Boolean(apiConfig.apiKey || apiConfig.apiKeyConfigured || result.apiKeyConfigured);
+    LS.set("ielts_api_config", { apiKey: apiConfig.apiKey || "", model: apiConfig.model, baseUrl: apiConfig.baseUrl, userConfigured: true });
+    keyInput.value = "";
+    renderSettings("模型设置已保存，可以回到学习台查询了。");
+  } catch (error) {
+    renderSettings(friendlyError(error));
+  } finally {
+    button.disabled = false;
+    button.textContent = oldText;
+  }
+}
+
+async function testApiSettings() {
+  const keyInput = $("#api-key");
+  const model = $("#model-name").value.trim() || DEFAULT_API_CONFIG.model;
+  const baseUrl = $("#base-url").value.trim() || DEFAULT_API_CONFIG.baseUrl;
+  let parsedUrl;
+  try { parsedUrl = new URL(baseUrl); } catch { parsedUrl = null; }
+  if (!parsedUrl || !/^https?:$/.test(parsedUrl.protocol)) {
+    renderSettings("接口地址需要是 http:// 或 https:// 开头的地址。");
+    $("#base-url").focus();
+    return;
+  }
+
+  const payload = { model, baseUrl: baseUrl.replace(/\/+$/, "") };
+  const enteredKey = keyInput.value.trim();
+  if (enteredKey) payload.apiKey = enteredKey;
+  const button = document.querySelector('[data-act="testconnection"]');
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = "测试中…";
+  renderSettings("正在测试模型连接…");
+
+  try {
+    let result;
+    if (appApi && appApi.testApiConnection) {
+      result = await appApi.testApiConnection(payload);
+    } else {
+      const response = await apiFetch("/api/test-connection", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ config: payload }),
+      });
+      result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 404 && !isLocalBrowser()) throw new Error("当前网页没有连接查询后端，请使用桌面应用，或在本机运行 npm run start:web 后访问 http://localhost:5179。");
+        throw new Error(result.error || `模型连接失败（${response.status}）`);
+      }
+    }
+    renderSettings(`模型连接成功 · ${result && result.model ? result.model : model}`);
+  } catch (error) {
+    renderSettings(friendlyError(error));
+  } finally {
+    button.disabled = false;
+    button.textContent = oldText;
+  }
+}
+
+function lookupConfig() {
+  if (appApi || (!apiConfig.userConfigured && !apiConfig.apiKey)) return {};
+  const config = { model: apiConfig.model, baseUrl: apiConfig.baseUrl };
+  if (apiConfig.apiKey) config.apiKey = apiConfig.apiKey;
+  return config;
+}
+function friendlyError(error) {
+  const message = String((error && error.message) || error || "");
+  if (/直接打开的文件|没有连接查询后端/.test(message)) return message;
+  if (/请先在模型设置中填写 API Key/.test(message)) return "请先在“模型设置”中填写 API Key。";
+  if (/Failed to fetch|fetch failed|Load failed|NetworkError|Error invoking remote method|服务暂不可用/i.test(message)) return "查询服务暂时不可用，请检查网络或接口地址。";
+  if (/DeepSeek API|模型接口返回|模型连接失败|模型接口未返回/.test(message)) return "模型连接失败，请检查 API Key、模型名称和接口地址，或点击“测试模型连接”。";
+  return message || "暂时无法完成查询，请稍后再试。";
+}
+
+function autogrow() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 130) + "px"; }
+input.addEventListener("input", autogrow);
+
+function switchTab(name) {
+  document.querySelectorAll(".nav-item").forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === name));
+  Object.entries(panels).forEach(([key, panel]) => panel.classList.toggle("hidden", key !== name));
+  if (name === "history") renderHistory();
+  if (name === "wordbook") renderWordbook();
+  if (name === "keyvocab") renderKeyvocab();
+  if (name === "settings") renderSettings();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+document.querySelectorAll(".nav-item").forEach((tab) => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
+
+function refreshBadges() {
+  const set = (selector, count) => { const node = $(selector); node.textContent = count; node.classList.toggle("hidden", !count); };
+  set("#hbadge", history.length); set("#wbadge", wordbook.length); set("#kbadge", keyvocab.length);
+  $("#stat-history").textContent = history.length;
+  $("#stat-key").textContent = keyvocab.length;
+  $("#stat-wordbook").textContent = wordbook.length;
+  $("#stat-cache").textContent = Object.keys(cache).length;
+  renderRailHistory();
+}
+
+function renderRailHistory() {
+  const rail = $("#rail-history");
+  if (!history.length) { rail.innerHTML = `<div class="rail-empty">查过的词会出现在这里，方便你随时回看。</div>`; return; }
+  rail.innerHTML = history.slice(0, 5).map((word) => `<div class="recent"><button type="button" data-act="open" data-word="${esc(word)}">${esc(word)}</button><span>回看</span></div>`).join("");
+}
+
+function renderWelcome() {
+  panels.results.innerHTML = `<section class="welcome">
+    <h2>从一个词开始，建立自己的高分表达库。</h2>
+    <p>查词后你会看到这个词在四项技能里的使用画像、真实搭配和 7/8/9 分例句。先从一个正在困扰你的词开始。</p>
+    <div class="welcome-grid">
+      <button class="welcome-action" type="button" data-act="suggest" data-word="substantial"><strong>substantial</strong><span>想表达“重要、可观”，但不想总用 important。</span></button>
+      <button class="welcome-action" type="button" data-act="suggest" data-word="mitigate"><strong>mitigate</strong><span>看看“缓解问题”在学术写作里如何更准确。</span></button>
+      <button class="welcome-action" type="button" data-act="suggest" data-word="significant"><strong>significant</strong><span>分辨它和 similar 近义词的语气差别。</span></button>
+    </div>
+    <div class="welcome-note"><span class="note-dot"></span><span>你的历史、重点词和生词本只保存在当前设备。</span></div>
+  </section>`;
+}
+
+function metric(label, score, color) {
+  const value = clamp(score);
+  return `<div class="metric"><span>${label}</span><div class="bar"><i style="width:${value * 20}%;background:${color}"></i></div><span class="mv">${value}<span style="color:var(--soft);font-weight:400">/5</span></span></div>`;
+}
+
+function entryHTML(data) {
+  const inWordbook = wordbook.includes(data.word);
+  const inKeyvocab = keyvocab.includes(data.word);
+  const skills = SKILLS.map((skill) => {
+    const value = (data.skills && data.skills[skill.key]) || {};
+    return `<div class="skill"><div class="name"><span class="dot" style="background:${skill.color}"></span>${skill.label}</div><div class="metrics">${metric("常见度", value.frequency, skill.color)}${metric("地道度", value.idiomatic, skill.color)}</div><div class="cm">${esc(value.comment)}</div></div>`;
+  }).join("");
+  const meanings = (data.meanings || []).map((meaning) => `<div class="meaning"><span class="pos">${esc(meaning.pos)}</span><span class="en">${esc(meaning.en)}</span><div class="zh">${esc(meaning.zh)}</div></div>`).join("");
+  const exampleItem = (item, index) => {
+    const value = typeof item === "string" ? { en: item, zh: "" } : (item || {});
+    const band = value.band || [7, 8, 9][index] || "";
+    return `<li>${band ? `<span class="band band-${band}">${band}分</span>` : ""}<span class="ex-t">${esc(value.en)}</span>${value.zh ? `<div class="ex-zh">${esc(value.zh)}</div>` : ""}<button class="copy" type="button" data-act="copy">复制英文</button></li>`;
+  };
+  const collocations = (data.collocations || []).map((item) => `<div class="collo"><span class="cp">${esc(item.phrase)}</span><div class="cz">${esc(item.zh)}</div></div>`).join("");
+  const upgrades = data.too_basic && (data.upgrades || []).length ? `<div class="warnbox"><div class="warn-h">基础词提醒：写作里可以换成更精准的表达</div>${data.upgrades.map((item) => `<div class="upg"><span class="uw">${esc(item.word)}</span><div class="un">${esc(item.note)}</div></div>`).join("")}</div>` : "";
+  const synonyms = (data.synonyms || []).map((item) => `<div class="syn"><span class="sw">${esc(item.word)}</span><div class="sd">${esc(item.distinction)}</div></div>`).join("");
+  const usage = data.best_usage || {};
+  return `<article class="entry">
+    <div class="headline"><div class="left"><div class="word">${esc(data.word)}</div><div class="ipa">${esc(data.pronunciation)}</div></div><div class="acts"><button class="action ${inWordbook ? "on" : ""}" type="button" data-act="wb" data-word="${esc(data.word)}">${inWordbook ? "已加入生词本" : "加入生词本"}</button><button class="action key ${inKeyvocab ? "on" : ""}" type="button" data-act="key" data-word="${esc(data.word)}">${inKeyvocab ? "已标记重点" : "标记重点"}</button></div></div>
+    ${upgrades}
+    <section class="entry-section"><h3 class="sec-title">听说读写 · 使用画像</h3>${skills}</section>
+    <section class="entry-section"><h3 class="sec-title">释义</h3>${meanings}</section>
+    <section class="entry-section"><h3 class="sec-title orange">雅思写作高频搭配</h3>${collocations || `<div class="empty">暂无搭配信息。</div>`}</section>
+    <section class="entry-section"><h3 class="sec-title teal">口语地道例句</h3><ul class="ex ex-speak">${(data.speaking_examples || []).map(exampleItem).join("")}</ul></section>
+    <section class="entry-section"><h3 class="sec-title orange">写作地道例句</h3><ul class="ex ex-write">${(data.writing_examples || []).map(exampleItem).join("")}</ul></section>
+    <section class="entry-section usage"><h3 class="sec-title">最地道 · 最加分用法</h3><div class="blk"><div class="lbl"><span class="dot" style="background:#2c8c92"></span>口语</div><p>${esc(usage.speaking)}</p></div><div class="blk"><div class="lbl"><span class="dot" style="background:#bb7137"></span>写作</div><p>${esc(usage.writing)}</p></div></section>
+    <section class="entry-section"><h3 class="sec-title">近义词辨析</h3>${synonyms || `<div class="empty">暂无近义词辨析。</div>`}</section>
+  </article>`;
+}
+
+async function fetchWord(word) {
+  await configReady;
+  if (appApi && appApi.lookupWord) return appApi.lookupWord(word);
+  const response = await apiFetch("/api/lookup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ word, config: lookupConfig() }) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.error) {
+    if (response.status === 404 && !isLocalBrowser()) throw new Error("当前网页没有连接查询后端，请使用桌面应用，或在本机运行 npm run start:web 后访问 http://localhost:5179。");
+    throw new Error(data.error || "查询服务暂时不可用，请稍后再试。");
+  }
+  return data;
+}
+
+function recordHistory(word) {
+  history = history.filter((item) => item.toLowerCase() !== word.toLowerCase());
+  history.unshift(word);
+  if (history.length > 100) history = history.slice(0, 100);
+}
+
+let querying = false;
+async function runQuery() {
+  if (querying) return;
+  const raw = input.value.trim();
+  if (!raw) return;
+  const seen = new Set();
+  const words = [];
+  raw.split(/[\s,;，、]+/).forEach((word) => { const normalized = word.trim().toLowerCase(); if (word && !seen.has(normalized)) { seen.add(normalized); words.push(word.trim()); } });
+  if (!words.length) return;
+  switchTab("results");
+  querying = true;
+  goBtn.disabled = true;
+  panels.results.innerHTML = `<div class="loading-stack"><div class="skeleton wide"></div><div class="skeleton"></div><div class="skeleton short"></div></div>`;
+  progress.classList.remove("hidden");
+  progress.classList.add("show");
+  for (let index = 0; index < words.length; index += 1) {
+    const word = words[index];
+    progressText.textContent = words.length > 1 ? `正在处理 ${index + 1}/${words.length}：${word}` : `正在整理「${word}」的使用方式…`;
+    try {
+      const data = await fetchWord(word);
+      cache[data.word] = data;
+      cache[word] = data;
+      recordHistory(data.word);
+      if (index === 0) panels.results.innerHTML = "";
+      panels.results.insertAdjacentHTML("beforeend", entryHTML(data));
+    } catch (error) {
+      if (index === 0) panels.results.innerHTML = "";
+      panels.results.insertAdjacentHTML("beforeend", `<div class="err">「${esc(word)}」暂时查不到。${esc(friendlyError(error))}</div>`);
+    }
+  }
+  save();
+  refreshBadges();
+  progress.classList.remove("show");
+  progress.classList.add("hidden");
+  goBtn.disabled = false;
+  querying = false;
+}
+
+function showCached(word) {
+  const data = cache[word];
+  switchTab("results");
+  if (data) { panels.results.innerHTML = entryHTML(data); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else { input.value = word; autogrow(); runQuery(); }
+}
+
+function meaningText(data) { return (data.meanings || []).map((meaning) => `${meaning.pos || ""} ${meaning.zh || ""}`.trim()).join("；"); }
+function listRow(word, deleteAction) {
+  const data = cache[word] || {};
+  return `<div class="row-item"><button class="row-open" type="button" data-act="open" data-word="${esc(word)}"><span class="w">${esc(word)}${data.pronunciation ? ` <span style="color:var(--soft);font-weight:400;font-size:12px">${esc(data.pronunciation)}</span>` : ""}</span><span class="meta">${esc(meaningText(data)) || "没有本地释义，打开后会重新查询"}</span></button><button class="row-delete" type="button" data-act="${deleteAction}" data-word="${esc(word)}">移除</button></div>`;
+}
+
+function renderListShell(title, description, actions, rows, note) {
+  return `<section class="list-section"><div class="list-head"><div><h2>${title}</h2><p>${description}</p></div><div class="list-actions">${actions}</div></div><div class="row-list">${rows || `<div class="empty">这里还没有内容。完成一次查询后，就可以在词条上进行收藏。</div>`}</div>${note ? `<p class="list-note">${note}</p>` : ""}</section>`;
+}
+function renderHistory() {
+  panels.history.innerHTML = renderListShell(`查询历史 · ${history.length}`, "最近查过的词会留在这里，方便回到原来的上下文。", history.length ? `<button class="subtle danger" type="button" data-act="clearhist">清空历史</button>` : "", history.map((word) => listRow(word, "delhist")).join(""));
+}
+function renderWordbook() {
+  if (!wordbook.length) { panels.wordbook.innerHTML = renderListShell("生词本 · 0", "把想带走复习的词集中起来。", "", "", "查到一个值得复习的词后，点击“加入生词本”。这里的内容会保存在当前设备。"); return; }
+  panels.wordbook.innerHTML = renderListShell(`生词本 · ${wordbook.length}`, "准备好后导出成 Anki 卡片。", `<button class="primary" type="button" data-act="apkg">导出 Anki</button><button class="subtle danger" type="button" data-act="clearwb">清空</button>`, wordbook.map((word) => listRow(word, "delwb")).join(""), "导出的卡片包含单词、中文释义和重点标记，可直接导入 Anki。");
+}
+function renderKeyvocab() {
+  if (!keyvocab.length) { panels.keyvocab.innerHTML = renderListShell("重点词汇 · 0", "把真正值得反复使用的词标出来。", "", "", "重点词会长期保存在当前设备，并可一键加入生词本。"); return; }
+  panels.keyvocab.innerHTML = renderListShell(`重点词汇 · ${keyvocab.length}`, "你标记过的高价值表达。", `<button class="subtle" type="button" data-act="kv2wb">全部加入生词本</button><button class="subtle danger" type="button" data-act="clearkey">清空</button>`, keyvocab.map((word) => listRow(word, "delkey")).join(""), "标记重点不会自动导出；需要复习时，先加入生词本再导出。");
+}
+
+function updateEntryButtons(word) {
+  const inWordbook = wordbook.includes(word);
+  const inKeyvocab = keyvocab.includes(word);
+  document.querySelectorAll(`.action[data-word="${CSS.escape(word)}"]`).forEach((button) => {
+    if (button.classList.contains("key")) { button.classList.toggle("on", inKeyvocab); button.textContent = inKeyvocab ? "已标记重点" : "标记重点"; }
+    else { button.classList.toggle("on", inWordbook); button.textContent = inWordbook ? "已加入生词本" : "加入生词本"; }
+  });
+}
+function toggleWordbook(word) {
+  wordbook = wordbook.includes(word) ? wordbook.filter((item) => item !== word) : [word, ...wordbook];
+  save(); refreshBadges(); updateEntryButtons(word);
+  if (!panels.wordbook.classList.contains("hidden")) renderWordbook();
+}
+function toggleKeyvocab(word) {
+  keyvocab = keyvocab.includes(word) ? keyvocab.filter((item) => item !== word) : [word, ...keyvocab];
+  save(); refreshBadges(); updateEntryButtons(word);
+  if (!panels.keyvocab.classList.contains("hidden")) renderKeyvocab();
+}
+
+async function exportApkg(button) {
+  const cards = wordbook.map((word) => ({ word, meaning: meaningText(cache[word] || {}), key: keyvocab.includes(word) }));
+  if (!cards.length) { alert("生词本是空的"); return; }
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = "正在生成…";
+  try {
+    if (appApi && appApi.exportApkg) {
+      const result = await appApi.exportApkg({ deck: "雅思生词本", cards });
+      if (result && !result.canceled) alert("Anki 卡片已导出。");
+      return;
+    }
+    const response = await apiFetch("/api/apkg", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ deck: "雅思生词本", cards }) });
+    if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.error || "导出失败，请稍后再试。"); }
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob); link.download = "雅思生词本.apkg"; link.click(); URL.revokeObjectURL(link.href);
+  } catch (error) { alert(friendlyError(error)); }
+  finally { button.disabled = false; button.textContent = oldText; }
+}
+
+function fallbackCopy(text, done) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text; textarea.style.position = "fixed"; textarea.style.opacity = "0";
+  document.body.appendChild(textarea); textarea.select();
+  try { document.execCommand("copy"); done(); } catch {}
+  textarea.remove();
+}
+
+document.addEventListener("click", (event) => {
+  const element = event.target.closest("[data-act]");
+  if (!element) return;
+  const action = element.dataset.act;
+  const word = element.dataset.word;
+  if (action === "suggest") { input.value = word; autogrow(); runQuery(); }
+  else if (action === "open-history") switchTab("history");
+  else if (action === "open") showCached(word);
+  else if (action === "wb") { event.stopPropagation(); toggleWordbook(word); }
+  else if (action === "key") { event.stopPropagation(); toggleKeyvocab(word); }
+  else if (action === "copy") {
+    event.stopPropagation();
+    const text = element.closest("li").querySelector(".ex-t").textContent;
+    const done = () => { element.classList.add("done"); element.textContent = "已复制"; setTimeout(() => { element.classList.remove("done"); element.textContent = "复制英文"; }, 1200); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done)); else fallbackCopy(text, done);
+  }
+  else if (action === "delhist") { event.stopPropagation(); history = history.filter((item) => item !== word); save(); refreshBadges(); renderHistory(); }
+  else if (action === "delwb") { event.stopPropagation(); wordbook = wordbook.filter((item) => item !== word); save(); refreshBadges(); renderWordbook(); updateEntryButtons(word); }
+  else if (action === "delkey") { event.stopPropagation(); keyvocab = keyvocab.filter((item) => item !== word); save(); refreshBadges(); renderKeyvocab(); updateEntryButtons(word); }
+  else if (action === "clearhist" && confirm("清空全部查询历史？")) { history = []; save(); refreshBadges(); renderHistory(); }
+  else if (action === "clearwb" && confirm("清空整个生词本？")) { wordbook = []; save(); refreshBadges(); renderWordbook(); }
+  else if (action === "clearkey" && confirm("清空全部重点词汇？")) { keyvocab = []; save(); refreshBadges(); renderKeyvocab(); }
+  else if (action === "kv2wb") { keyvocab.forEach((item) => { if (!wordbook.includes(item)) wordbook.unshift(item); }); save(); refreshBadges(); switchTab("wordbook"); }
+  else if (action === "apkg") exportApkg(element);
+  else if (action === "testconnection") { event.stopPropagation(); testApiSettings(); }
+  else if (action === "openconfig" && appApi && appApi.openConfig) appApi.openConfig().catch((error) => renderSettings(friendlyError(error)));
+});
+
+$("#search-form").addEventListener("submit", (event) => { event.preventDefault(); runQuery(); });
+$("#settings-form").addEventListener("submit", saveApiSettings);
+input.addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) { event.preventDefault(); runQuery(); } });
+$("#today-label").textContent = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(new Date());
+renderWelcome();
+refreshBadges();
+configReady = loadApiConfig();
+</script>
+</body>
+</html>

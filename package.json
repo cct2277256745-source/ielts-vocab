@@ -1,0 +1,49 @@
+{
+  "name": "ielts-vocab-desktop",
+  "version": "1.0.0",
+  "description": "面向雅思备考的 macOS 词汇学习工具",
+  "main": "main.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "install:cn": "ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ npm install --registry=https://registry.npmmirror.com",
+    "start": "node scripts/start-desktop.js",
+    "start:dev": "electron .",
+    "start:web": "node server.js",
+    "dist": "electron-builder --mac --config.electronDist=node_modules/electron/dist",
+    "dist:app": "electron-builder --mac dir --config.electronDist=node_modules/electron/dist",
+    "dist:dmg": "hdiutil create -volname 雅思词汇 -srcfolder dist/mac-arm64/雅思词汇.app -ov -format UDZO dist/雅思词汇-1.0.0-arm64.dmg"
+  },
+  "build": {
+    "appId": "local.ielts.vocab",
+    "productName": "雅思词汇",
+    "executableName": "雅思词汇",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "core.js",
+      "main.js",
+      "preload.js",
+      ".env.example",
+      "server.js",
+      "icon.icns",
+      "icon.png",
+      "README.md"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        "dir",
+        "dmg"
+      ],
+      "icon": "icon.icns"
+    }
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.8.1"
+  }
+}
